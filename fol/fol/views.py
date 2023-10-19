@@ -15,10 +15,10 @@ def register(request):
       username = request.POST['username']
       email = request.POST['email']
       phonenumber = request.POST['phonenumber']
-      pasword = request.POST['password']
+      password = request.POST['password']
       password2 = request.POST['password2']
     
-      if pasword == password2:
+      if password == password2:
           if User.objects.filter(email=email).exists():
               messages.info(request, 'Email already Exists')
               return redirect('register')
@@ -26,11 +26,11 @@ def register(request):
               messages.info(request, 'Username already Exists')
               return redirect('register')
           else:
-              user =  User.objects.create_user(username=username, email=email, password=pasword)
+              user =  User.objects.create_user(username=username, password=password)
               user.save();
               return redirect('login')
       else:
-          messages.info(request, 'Pasword is not the same')            
+          messages.info(request, 'password is not the same')            
           return redirect('register')
     else:
       return render(request, 'register.html')
@@ -59,4 +59,13 @@ def logout(request):
 
 
 def payment(request):
+    if request.method == "POST":
+        phonenumber = request.POST.get('phonenumber')
+        amount = request.POST.get('amount')
+        amount = int(amount)
+        account_reference = 'WANYAMA'
+        transaction_desc = 'STK Push Description'
+        callback_url = stk_push_callback_url
+        r = cl.stk_push(phonenumber, amount, account_reference, transaction_desc, callback_url)
+        return JsonResponse(r.response_description, safe=False)
     return render(request, 'payment.html')
