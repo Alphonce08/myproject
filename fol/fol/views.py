@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
+from django.contrib import admin
+
 
 
 
@@ -59,13 +61,34 @@ def logout(request):
 
 
 def payment(request):
+     
+
     if request.method == "POST":
-        phonenumber = request.POST.get('phonenumber')
-        amount = request.POST.get('amount')
-        amount = int(amount)
-        account_reference = 'WANYAMA'
-        transaction_desc = 'STK Push Description'
-        callback_url = stk_push_callback_url
-        r = cl.stk_push(phonenumber, amount, account_reference, transaction_desc, callback_url)
-        return JsonResponse(r.response_description, safe=False)
+        phone = request.POST['phonenumber']
+        amount = product.price
+        access_token = MpesaAccessToken.validated_mpesa_access_token
+        api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        headers = {"Authorization": "Bearer %s" % access_token}
+        request = {
+            "BusinessShortCode": LipanaMpesaPassword.Business_short_code,
+            "Password": LipanaMpesaPassword.decode_password,
+            "Timestamp": LipanaMpesaPassword.lipa_time,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": amount,
+            "PartyA": phone,
+            "PartyB": LipanaMpesaPassword.Business_short_code,
+            "PhoneNumber": phone,
+            "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
+            "AccountReference": "PYMENT001",
+            "TransactionDesc": "School fees"
+        }
+
+        response = requests.post(api_url, json=request, headers=headers)
+        return HttpResponse("success")
+
+    
     return render(request, 'payment.html')
+
+
+def post(request, pk):
+    return render(request, 'post.html')
