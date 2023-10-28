@@ -61,11 +61,9 @@ def logout(request):
 
 
 def payment(request):
-     
-
     if request.method == "POST":
-        phone = request.POST['phonenumber']
-        amount = product.price
+        phone = request.POST.get('form')
+        amount = request.POST.get("amount")
         access_token = MpesaAccessToken.validated_mpesa_access_token
         api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         headers = {"Authorization": "Bearer %s" % access_token}
@@ -75,7 +73,7 @@ def payment(request):
             "Timestamp": LipanaMpesaPassword.lipa_time,
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
-            "PartyA": phone,
+            "PartyA": phone, 
             "PartyB": LipanaMpesaPassword.Business_short_code,
             "PhoneNumber": phone,
             "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
@@ -83,7 +81,7 @@ def payment(request):
             "TransactionDesc": "School fees"
         }
 
-        response = requests.post(api_url, json=request, headers=headers)
+        response = request.post(api_url, json=request, headers=headers)
         return HttpResponse("success")
 
     

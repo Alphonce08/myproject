@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.urls import re_path as url, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,7 +27,6 @@ urlpatterns = [
     path('register', views.register, name='register'),
     path('login', views.login, name='login'),
     path("logout", views.logout, name="logout"),
-    path('payment', views.payment, name='payment'),
-    path('post/<str:pk>', views.post, name='post')
+    path('payment', views.payment, name='payment')
    
 ]
